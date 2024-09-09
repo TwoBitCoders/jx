@@ -1,0 +1,60 @@
+{
+  "books": [
+    {
+        "isbn":"9780156685689",
+        "title":"Old Possum's Book of Practical Cats",
+        "subtitle":"",
+        "author":"T.S. Eliot, Edward Gorey",
+        "published":"1982-08-30T00:00:00.000Z",
+        "publisher":"Ecco",
+        "pages":64,
+        "description":"These lovable cat poems were written by T. S. Eliot for his godchildren and continue to delight children and adults alike.",
+        "website":""
+    },
+    {
+        "isbn":"9780141190280",
+        "title":"Cat on a Hot Tin Roof",
+        "subtitle":"",
+        "author":"Tennessee Williams",
+        "published":"1979-10-25T00:00:00.000Z",
+        "publisher":"Penguin UK",
+        "pages":144,
+        "description":"'Big Daddy' Pollitt, the richest cotton planter in the Mississippi Delta, is about to celebrate his sixty-fifth birthday. His two sons have returned home for the Gooper, his wife and children, Brick, an ageing football hero who has turned to drink, and his feisty wife Maggie.",
+        "website":""
+    },
+    {
+        "isbn":"9780394800011",
+        "title":"The Cat in the Hat",
+        "subtitle":"",
+        "author":"Dr. Seuss",
+        "published":"1957-03-12T00:00:00.000Z",
+        "publisher":"Random House Books for Young Readers",
+        "pages":61,
+        "description":"A rainy day turns into a wild romp when the Cat in the Hat and his troublemaking friends, Thing One and Thing Two, unexpectedly appear! A favorite among kids, parents, and teachers, this story uses simple words and basic rhyme to encourage and delight beginning readers.",
+        "website":""
+    },
+    {
+        "isbn":"9780385333481",
+        "title":"Cat's Cradle",
+        "subtitle":"",
+        "author":"Kurt Vonnegut",
+        "published":"1998-09-08T00:00:00.000Z",
+        "publisher":"Dell Publishing",
+        "pages":304,
+        "description":"Cat’s Cradle is Kurt Vonnegut’s satirical commentary on modern man and his madness. An apocalyptic tale of this planet’s ultimate fate, it features a midget as the protagonist, a complete, original theology created by a calypso singer, and a vision of the future that is at once blackly fatalistic and hilariously funny. A book that left an indelible mark on an entire generation of readers, Cat’s Cradle is one of the twentieth century’s most important works—and Vonnegut at his very best.",
+        "website":""
+    },
+    {
+        "isbn":"9781506746234",
+        "title":"Gunsmith Cats Omnibus Volume 2",
+        "subtitle":"",
+        "author":"Kenichi Sonoda",
+        "published":"2025-05-06T00:00:00.000Z",
+        "publisher":"Dark Horse Manga",
+        "pages":640,
+        "description":"Rally Vincent runs Gunsmith Cats—a gun shop in Illinois with her partner, demolitions expert and former call girl Minnie-May Hopkins. But Rally’s “real” job doesn’t pay the bills, her hobby does. And her hobby is bounty hunting, bringing the most wanted men and women in the Chicago area to justice—dressed in her sharp suit and tie, and driving her Shelby Cobra GT 500!",
+        "website":""
+    }
+  ],
+  "numBooks": 5
+}

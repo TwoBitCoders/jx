@@ -1,0 +1,53 @@
+{
+  "dragons": [
+    {
+      "id": 1,
+      "family": "Chromatic",
+      "type": "Red",
+      "alignment": "Chaotic Evil",
+      "breath": "Fire",
+      "deity": "Tiamat"
+    },
+    {
+      "id": 2,
+      "family": "Chromatic",
+      "type": "Black",
+      "alignment": "Chaotic Evil",
+      "breath": "Acid",
+      "deity": "Tiamat"
+    },
+    {
+      "id": 3,
+      "family": "Chromatic",
+      "type": "Green",
+      "alignment": "Chaotic Evil",
+      "breath": "Poison Gas",
+      "deity": "Tiamat"
+    },
+    {
+      "id": 4,
+      "family": "Metallic",
+      "type": "Gold",
+      "alignment": "Lawful Good",
+      "breath": "Fire and Poison Gas",
+      "deity": "Bahamut"
+    },
+    {
+      "id": 5,
+      "family": "Metallic",
+      "type": "Silver",
+      "alignment": "Lawful Good",
+      "breath": "Cold and Paralysing Gas",
+      "deity": "Bahamut"
+    },
+    {
+      "id": 6,
+      "family": "Metallic",
+      "type": "Brass",
+      "alignment": "Chaotic Good",
+      "breath": "Fire and Sleep Gas",
+      "deity": "Bahamut"
+    }
+  ],
+  "numDragons": 6
+}
