@@ -1,14 +1,14 @@
-# jx: Memory-Safe JSON Processing in Go with JavaScript Commands
+# jx: Memory-Safe JSON Processing using JavaScript implemented in Go
 
-Welcome to **jx**, a cutting-edge tool designed to revolutionize JSON processing! Developed by **TwoBitCoders**, we are a group of passionate professionals dedicated to making life easier for our fellow coders. With **jx**, we combine the performance and safety of Go with the familiarity of JavaScript commands, eliminating the need to learn jq’s complex language.
+Welcome to **jx**, a cutting-edge tool designed to revolutionize JSON processing! Developed by **TwoBitCoders**, we are a group of passionate professionals dedicated to making life easier for our fellow coders. With **jx**, we combine the performance and safety of Go with the familiarity of JavaScript syntax, eliminating the need to learn jq’s complex language.
 
 ## Features
 
 - **Memory Safe**: Built in Go, ensuring secure and efficient JSON processing.
-- **JavaScript Commands**: Leverage your JavaScript knowledge for seamless JSON manipulation.
+- **JavaScript Syntax**: Leverage your JavaScript knowledge for seamless JSON manipulation.
 - **Cross-Platform**: Easily compile and run on any platform with our 100% Go implementation.
 - **High Performance**: Achieve speeds comparable to jq with added safety and ease of use.
-- **Intuitive Syntax**: Use familiar JavaScript commands to process JSON data.
+- **Intuitive Syntax**: Use familiar JavaScript to process JSON data.
 
 ## Why jx?
 
@@ -38,11 +38,11 @@ Here are some common use cases to get you started:
 
 - **Extract a Field**:
     ```sh
-    jx 'data.field'
+    echo '{"foo":42,"bar":0} | jx 'x.foo'
     ```
 - **Filter Data**:
     ```sh
-    jx 'data.filter(item => item.active)'
+    echo '{"foo":42, "bar":0} | jx 'x.filter(item => item.foo === 42)'
     ```
 
 For detailed documentation, tutorials, and examples, visit our [Wiki](#).
