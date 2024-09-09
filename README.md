@@ -38,11 +38,11 @@ Here are some common use cases to get you started:
 
 - **Extract a Field**:
     ```sh
-    echo '{"foo":42,"bar":0} | jx 'x.foo'
+    echo '{"foo":42,"bar":0}' | jx 'x.foo'
     ```
 - **Filter Data**:
     ```sh
-    echo '{"foo":42, "bar":0} | jx 'x.filter(item => item.foo === 42)'
+    echo '[{"foo":42},{"foo":0}]' | jx 'x.filter(item => item.foo !== 0)'
     ```
 
 For detailed documentation, tutorials, and examples, visit our [Wiki](#).
