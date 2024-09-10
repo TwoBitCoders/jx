@@ -96,3 +96,6 @@ echo '{"foo":0}' | out/jx --tab
 echo "Test 0013 ******"
 out/jx --version
 
+echo "Test 0014 ******"
+cat tests/data/dragons.json | out/jx 'x.xyz()'
+

@@ -15,27 +15,27 @@ import (
 
 const (
     Version = "0.0.2"
-    NoError = 0 
-    FalseOrNull = 1 
-    UsageError = 2
-    CompileError = 3
-    NoValidResult = 4
 )
 
-const template = `
-    v = JSON.parse(json);
-    f = x=>%s;
-    r = {};
-    r.v = f(v);
-    JSON.stringify(r, null, null);
-`
+type ResultCode int
+
+const (
+    NoError ResultCode = iota
+    FalseOrNull
+    UsageError
+    CompileError
+    NoValidResult
+)
+
+const template = `v = JSON.parse(json); f = x=>%s; r = {}; r.v = f(v); JSON.stringify(r, null, null); `
+
 func formatJSON(v interface{}, opts Options) ([]byte, error) {
     f := ColorJsonFormatterNew()
     f.SortKeys = opts.sortKeys
     f.DisabledColor = opts.mono
     s, err := f.Marshal(v)
     if err != nil {
-        fmt.Printf("err:%s\n", err)
+        return nil, fmt.Errorf("err:%s\n", err)
     }
 	return s, nil
 }
@@ -46,7 +46,7 @@ func formatJSONIndent(v interface{}, indent string, opts Options) ([]byte, error
     f.DisabledColor = opts.mono
     s, err := f.MarshalIndent(v, indent)
     if err != nil {
-        fmt.Printf("err:%s\n", err)
+        return nil, fmt.Errorf("err:%s\n", err)
     }
 	return s, nil
 }
@@ -75,39 +75,44 @@ func runScript(vm *goja.Runtime, script string, jsonVal []byte) (goja.Value, err
     // run it
     v, err := vm.RunString(js)
     if err != nil {
-        panic(err)
+        return nil, err
     }
 
     return v, nil
 }
 
-func outputVal(v interface{}, opts Options) {
+func outputVal(v interface{}, opts Options) error {
     var indentStr string
 
     var buf []byte
     var err error
     if opts.compact {
         buf, err = formatJSON(v, opts)
+        if err != nil {
+            return err
+        }
     } else if opts.tabs {
         indentStr = "\t"
         buf, err = formatJSONIndent(v, indentStr, opts)
         if err != nil {
-            fmt.Printf("%s\n", err)
+            return err
         }
     } else {
         indentStr = strings.Repeat(" ", opts.indent)
         buf, err = formatJSONIndent(v, indentStr, opts)
         if err != nil {
-            fmt.Printf("%s\n", err)
+            return err
         }
     }
     fmt.Printf("%s\n", string(buf))
+    return nil
 }
 
 func biteStream(vm *goja.Runtime, script string, d *jstream.Decoder,
-    stdoutTTY bool, opts Options) (bool, error) {
+    stdoutTTY bool, opts Options) (ResultCode, error) {
     var jv []byte
     var err error
+    var v interface{}
     for mv := range d.Stream() {
         switch foo := mv.Value.(type) {
         case jstream.KVS:
@@ -117,40 +122,56 @@ func biteStream(vm *goja.Runtime, script string, d *jstream.Decoder,
         }
         err = d.Err()
         if err != nil {
-            return false, err
+            return UsageError, fmt.Errorf("Error parsing inputs %s\n", err)
         } 
 
         rv, err := runScript(vm, script, jv)
         if err != nil {
-            return false, fmt.Errorf("Error runing user script %s\n", err)
+            return CompileError, err
         }
 
         var x *string
         vm.ExportTo(rv, &x)
         r := orderedmap.New()
         json.Unmarshal([]byte(*x), &r)
-        v, _ := r.Get("v")
+        v, _ = r.Get("v")
 
-        outputVal(v, opts)
+        err = outputVal(v, opts)
+        if err != nil {
+            return NoValidResult, fmt.Errorf("Error outputting value %s\n", err)
+        }
+
     }
 
-    return true, nil
+    // When exitStatus flag is set check for these specific conditions
+    if opts.exitStatus {
+        switch x := v.(type) {
+        case nil:
+            return FalseOrNull, nil
+        case bool:
+            if x == false {
+                return FalseOrNull, nil
+            }
+        }
+     }
+
+    return NoError, nil
 }
 
-func slurpStream(vm *goja.Runtime, script string, d *jstream.Decoder, stdoutTTY bool, opts Options) error {
+func slurpStream(vm *goja.Runtime, script string, d *jstream.Decoder, stdoutTTY bool, opts Options) (ResultCode, error) {
     var a []string
     for mv := range d.Stream() {
         jv, err := json.Marshal(mv.Value)
         err = d.Err()
         if err != nil {
-            return err
+            return UsageError, fmt.Errorf("Error parsing inputs %s\n", err)
         }
         a = append(a, string(jv))
     }
     jv := fmt.Sprintf("[%s]", strings.Join(a, ","))
     rv, err := runScript(vm, script, []byte(jv))
     if err != nil {
-        return fmt.Errorf("Error runing user script %s\n", err)
+        return CompileError, err
     }
 
     var x *string
@@ -161,20 +182,20 @@ func slurpStream(vm *goja.Runtime, script string, d *jstream.Decoder, stdoutTTY 
 
     outputVal(v, opts)
 
-    return nil
+    return NoError, nil
 }
 
-func runScriptForFile(script string, path *string, 
-    stdoutTTY bool, opts Options) (bool, error) {
+func processStream(script string, path *string, 
+    stdoutTTY bool, opts Options) (ResultCode, error) {
     var f *os.File
     var err error
-    var x bool
+    var rc ResultCode
     if path == nil {
         f = os.Stdin
     } else {
         f, err = os.Open(*path)
         if err != nil {
-            return x, fmt.Errorf("%s: Could not open %s: %s\n", os.Args[0], *path, err) 
+            return rc, fmt.Errorf("%s: Could not open %s: %s\n", os.Args[0], *path, err) 
         }
         defer f.Close()
     }
@@ -182,22 +203,21 @@ func runScriptForFile(script string, path *string,
     vm := goja.New()
     decoder := jstream.NewDecoder(f, 0)
 
-    // This nonsense is required to get the decoder to preserve key order
-    // It does at least seem to work
+    // Required to get the decoder to preserve key order
     decoder = decoder.EmitKV()
     decoder = decoder.ObjectAsKVS()
     if opts.slurp {
-        err = slurpStream(vm, script, decoder, stdoutTTY, opts)
+        rc, err = slurpStream(vm, script, decoder, stdoutTTY, opts)
         if err != nil {
-            return x, err
+            return rc, err
         }
     } else {
-        x, err = biteStream(vm, script, decoder, stdoutTTY, opts)
+        rc, err = biteStream(vm, script, decoder, stdoutTTY, opts)
         if err != nil {
-            return x, err
+            return rc, err
         }
     }
-    return x, nil
+    return rc, nil
 }
 
 type Options struct {
@@ -239,12 +259,12 @@ func main() {
 
     if opts.help {
         flag.Usage()
-        os.Exit(UsageError)
+        os.Exit(int(UsageError))
     }
 
     if opts.printVersion {
         fmt.Printf("%s %s\n", os.Args[0], Version)
-        os.Exit(NoError)
+        os.Exit(int(NoError))
     }
 
     // test if stdin has stuff to read, so we can make more decisions later
@@ -257,7 +277,7 @@ func main() {
     // No data to read and no args at all, give the user a hand and exit
     if !stdinData && (len(flag.Args()) < 1) {
         flag.Usage()
-        os.Exit(UsageError)
+        os.Exit(int(UsageError))
     } 
 
     // test if the user specified a script as an option, if 
@@ -283,7 +303,7 @@ func main() {
     if opts.indent < 0 || opts.indent > 7 {
         fmt.Printf("%s: --indent takes a number between -1 and 7\n", os.Args[0])
         flag.Usage()
-        os.Exit(UsageError)
+        os.Exit(int(UsageError))
     }
 
     // get the user script
@@ -293,7 +313,7 @@ func main() {
         buf, err := readUserFile(opts.scriptFile)
         if err != nil {
             fmt.Printf("%s\n", err)
-            os.Exit(UsageError)
+            os.Exit(int(UsageError))
         }
         userScript = string(buf)
     } else if opts.scriptFile == "" && len(flag.Args()) < 1 {
@@ -305,31 +325,24 @@ func main() {
     // finally get down to business
     // run the provided script either against the
     // specified files or stdin
-    var x interface{}
+    var rc ResultCode
     if len(userFiles) > 0 {
         for i := range userFiles {
             userFile := userFiles[i]
-            x, err = runScriptForFile(userScript, &userFile, stdoutTTY, opts)
+            rc, err = processStream(userScript, &userFile, stdoutTTY, opts)
             if err != nil {
-                fmt.Printf("%s: Error - %s\n", os.Args[0], err)
+                fmt.Printf("%s: %s\n", os.Args[0], err)
                 return
             }
         }
     } else {
-        x, err = runScriptForFile(userScript, nil, stdoutTTY, opts)
+        rc, err = processStream(userScript, nil, stdoutTTY, opts)
         if err != nil {
-            fmt.Printf("%s: Error - %s\n", os.Args[0], err)
+            fmt.Printf("%s: %s\n", os.Args[0], err)
             return
         }
     }
 
-    // When exitStatus flag is set check for these specific conditions
-    r := 0
-    if opts.exitStatus && x == false {
-        r = FalseOrNull
-    }
-
-    os.Exit(r)
+    os.Exit(int(rc))
 }
-
 
