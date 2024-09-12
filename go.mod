@@ -8,4 +8,5 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/spf13/pflag v1.0.5
+	github.com/tidwall/pretty v1.2.1
 )

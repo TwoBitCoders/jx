@@ -9,12 +9,12 @@ import (
 
 	"github.com/bcicen/jstream"
 	"github.com/dop251/goja"
-    "github.com/iancoleman/orderedmap"
 	flag "github.com/spf13/pflag"
+	"github.com/tidwall/pretty"
 )
 
 const (
-    Version = "0.0.2"
+    Version = "0.0.3"
 )
 
 type ResultCode int
@@ -27,28 +27,26 @@ const (
     NoValidResult
 )
 
-const template = `v = JSON.parse(json); f = x=>%s; r = {}; r.v = f(v); JSON.stringify(r, null, null); `
+const template = `
+v = JSON.parse(json); 
+f = x=>%s; 
+v = f(v); 
+JSON.stringify(v, null, null); `
 
-func formatJSON(v interface{}, opts Options) ([]byte, error) {
-    f := ColorJsonFormatterNew()
-    f.SortKeys = opts.sortKeys
-    f.DisabledColor = opts.mono
-    s, err := f.Marshal(v)
-    if err != nil {
-        return nil, fmt.Errorf("err:%s\n", err)
+func formatJSON(buf []byte, opts Options) ([]byte, error) {
+    if !opts.mono {
+        buf = pretty.Color(buf, nil)
     }
-	return s, nil
+	return buf, nil
 }
 
-func formatJSONIndent(v interface{}, indent string, opts Options) ([]byte, error) {
-    f := ColorJsonFormatterNew()
-    f.SortKeys = opts.sortKeys
-    f.DisabledColor = opts.mono
-    s, err := f.MarshalIndent(v, indent)
-    if err != nil {
-        return nil, fmt.Errorf("err:%s\n", err)
+func formatJSONIndent(buf []byte, indent string, opts Options) ([]byte, error) {
+    var pOpts = &pretty.Options{Width: 80, Prefix:"", Indent: indent, SortKeys: opts.sortKeys}
+    buf = pretty.PrettyOptions(buf, pOpts)
+    if !opts.mono {
+        buf = pretty.Color(buf, nil)
     }
-	return s, nil
+	return buf, nil
 }
 
 func readUserFile(path string) ([]byte, error) {
@@ -81,7 +79,7 @@ func runScript(vm *goja.Runtime, script string, jsonVal []byte) (goja.Value, err
     return v, nil
 }
 
-func outputVal(v interface{}, opts Options) error {
+func outputVal(v []byte, opts Options) error {
     var indentStr string
 
     var buf []byte
@@ -104,7 +102,7 @@ func outputVal(v interface{}, opts Options) error {
             return err
         }
     }
-    fmt.Printf("%s\n", string(buf))
+    fmt.Printf("%s", string(buf))
     return nil
 }
 
@@ -112,7 +110,7 @@ func biteStream(vm *goja.Runtime, script string, d *jstream.Decoder,
     stdoutTTY bool, opts Options) (ResultCode, error) {
     var jv []byte
     var err error
-    var v interface{}
+    var buf []byte
     for mv := range d.Stream() {
         switch foo := mv.Value.(type) {
         case jstream.KVS:
@@ -130,13 +128,9 @@ func biteStream(vm *goja.Runtime, script string, d *jstream.Decoder,
             return CompileError, err
         }
 
-        var x *string
-        vm.ExportTo(rv, &x)
-        r := orderedmap.New()
-        json.Unmarshal([]byte(*x), &r)
-        v, _ = r.Get("v")
+        vm.ExportTo(rv, &buf)
 
-        err = outputVal(v, opts)
+        err = outputVal(buf, opts)
         if err != nil {
             return NoValidResult, fmt.Errorf("Error outputting value %s\n", err)
         }
@@ -145,15 +139,10 @@ func biteStream(vm *goja.Runtime, script string, d *jstream.Decoder,
 
     // When exitStatus flag is set check for these specific conditions
     if opts.exitStatus {
-        switch x := v.(type) {
-        case nil:
+        if string(buf) == "false" || string(buf) == "null" {
             return FalseOrNull, nil
-        case bool:
-            if x == false {
-                return FalseOrNull, nil
-            }
         }
-     }
+    }
 
     return NoError, nil
 }
@@ -174,13 +163,9 @@ func slurpStream(vm *goja.Runtime, script string, d *jstream.Decoder, stdoutTTY 
         return CompileError, err
     }
 
-    var x *string
-    vm.ExportTo(rv, &x)
-    r := orderedmap.New()
-    json.Unmarshal([]byte(*x), &r)
-    v, _ := r.Get("v")
-
-    outputVal(v, opts)
+    var buf []byte
+    vm.ExportTo(rv, &buf)
+    outputVal(buf, opts)
 
     return NoError, nil
 }
