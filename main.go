@@ -9,12 +9,13 @@ import (
 
 	"github.com/bcicen/jstream"
 	"github.com/dop251/goja"
-	flag "github.com/spf13/pflag"
 	"github.com/tidwall/pretty"
+	flag "github.com/spf13/pflag"
+    colorable "github.com/mattn/go-colorable"
 )
 
 const (
-    Version = "0.0.3"
+    Version = "0.0.4"
 )
 
 type ResultCode int
@@ -102,7 +103,8 @@ func outputVal(v []byte, opts Options) error {
             return err
         }
     }
-    fmt.Printf("%s", string(buf))
+    out := colorable.NewColorableStdout()
+    fmt.Fprintf(out, "%s", string(buf))
     return nil
 }
 
