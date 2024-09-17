@@ -1,0 +1,8 @@
+#!/bin/sh 
+
+GOOS='linux' GOARCH='amd64' go build -o out/linux/amd64/
+GOOS='linux' GOARCH='386' go build -o out/linux/386/
+GOOS='darwin' GOARCH='amd64' go build -o out/darwin/amd64/
+GOOS='darwin' GOARCH='arm64' go build -o out/darwin/arm64/
+GOOS='windows' GOARCH='amd64' go build -o out/windows/amd64/
+GOOS='windows' GOARCH='386' go build -o out/windows/386/
