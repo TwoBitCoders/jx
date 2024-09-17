@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    Version = "0.0.4"
+    Version = "0.0.5"
 )
 
 type ResultCode int
@@ -34,8 +34,18 @@ f = x=>%s;
 v = f(v); 
 JSON.stringify(v, null, null); `
 
+// Test if stdout is hooked to a tty 
+// We want to know, so we can make good decisions about when to colorize
+func isTTY() (bool) {
+    stat, _ := os.Stdout.Stat()
+    if (stat.Mode() & os.ModeCharDevice) == os.ModeCharDevice {
+       return true
+    }
+    return false
+}
+
 func formatJSON(buf []byte, opts Options) ([]byte, error) {
-    if !opts.mono {
+    if (opts.color || isTTY()) && !opts.mono {
         buf = pretty.Color(buf, nil)
     }
 	return buf, nil
@@ -44,7 +54,7 @@ func formatJSON(buf []byte, opts Options) ([]byte, error) {
 func formatJSONIndent(buf []byte, indent string, opts Options) ([]byte, error) {
     var pOpts = &pretty.Options{Width: 80, Prefix:"", Indent: indent, SortKeys: opts.sortKeys}
     buf = pretty.PrettyOptions(buf, pOpts)
-    if !opts.mono {
+    if (opts.color || isTTY()) && !opts.mono {
         buf = pretty.Color(buf, nil)
     }
 	return buf, nil
@@ -103,13 +113,13 @@ func outputVal(v []byte, opts Options) error {
             return err
         }
     }
+
     out := colorable.NewColorableStdout()
     fmt.Fprintf(out, "%s", string(buf))
     return nil
 }
 
-func biteStream(vm *goja.Runtime, script string, d *jstream.Decoder,
-    stdoutTTY bool, opts Options) (ResultCode, error) {
+func biteStream(vm *goja.Runtime, script string, d *jstream.Decoder, opts Options) (ResultCode, error) {
     var jv []byte
     var err error
     var buf []byte
@@ -149,7 +159,8 @@ func biteStream(vm *goja.Runtime, script string, d *jstream.Decoder,
     return NoError, nil
 }
 
-func slurpStream(vm *goja.Runtime, script string, d *jstream.Decoder, stdoutTTY bool, opts Options) (ResultCode, error) {
+func slurpStream(vm *goja.Runtime, script string, d *jstream.Decoder, 
+    opts Options) (ResultCode, error) {
     var a []string
     for mv := range d.Stream() {
         jv, err := json.Marshal(mv.Value)
@@ -173,7 +184,7 @@ func slurpStream(vm *goja.Runtime, script string, d *jstream.Decoder, stdoutTTY 
 }
 
 func processStream(script string, path *string, 
-    stdoutTTY bool, opts Options) (ResultCode, error) {
+    opts Options) (ResultCode, error) {
     var f *os.File
     var err error
     var rc ResultCode
@@ -194,12 +205,12 @@ func processStream(script string, path *string,
     decoder = decoder.EmitKV()
     decoder = decoder.ObjectAsKVS()
     if opts.slurp {
-        rc, err = slurpStream(vm, script, decoder, stdoutTTY, opts)
+        rc, err = slurpStream(vm, script, decoder, opts)
         if err != nil {
             return rc, err
         }
     } else {
-        rc, err = biteStream(vm, script, decoder, stdoutTTY, opts)
+        rc, err = biteStream(vm, script, decoder, opts)
         if err != nil {
             return rc, err
         }
@@ -212,6 +223,7 @@ type Options struct {
     slurp bool
     compact bool
     indent int
+    color bool
     mono bool
     tabs bool
     sortKeys bool
@@ -236,6 +248,7 @@ func main() {
     flag.BoolVarP(&opts.slurp, "slurp", "s", false, "Read entire stream into array, run script once")
     flag.IntVar(&opts.indent, "indent", 2, "Number of spaces per indentation")
     flag.BoolVarP(&opts.compact, "compact-output", "c", false, "Minimize output")
+    flag.BoolVarP(&opts.color, "color-output", "C", false, "Colorize JSON output")
     flag.BoolVarP(&opts.mono, "monochrome-output", "M", false, "Disable colored output")
     flag.BoolVar(&opts.tabs, "tab", false, "Use tabs instead of spaces")
     flag.BoolVarP(&opts.sortKeys, "sort-keys", "S", false, "Sort object keys")
@@ -279,13 +292,6 @@ func main() {
         userFiles = flag.Args()[userFileIndex:]
     }
 
-    // test if stdout is a tty
-    stdoutTTY := false 
-    stat, _ = os.Stdout.Stat()
-    if (stat.Mode() & os.ModeCharDevice) == os.ModeCharDevice {
-       stdoutTTY = true
-    }
-
     // if the user set indent outside range let them know and exit
     if opts.indent < 0 || opts.indent > 7 {
         fmt.Printf("%s: --indent takes a number between -1 and 7\n", os.Args[0])
@@ -316,14 +322,14 @@ func main() {
     if len(userFiles) > 0 {
         for i := range userFiles {
             userFile := userFiles[i]
-            rc, err = processStream(userScript, &userFile, stdoutTTY, opts)
+            rc, err = processStream(userScript, &userFile, opts)
             if err != nil {
                 fmt.Printf("%s: %s\n", os.Args[0], err)
                 return
             }
         }
     } else {
-        rc, err = processStream(userScript, nil, stdoutTTY, opts)
+        rc, err = processStream(userScript, nil, opts)
         if err != nil {
             fmt.Printf("%s: %s\n", os.Args[0], err)
             return
