@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    Version = "0.0.5"
+    Version = "0.0.6"
 )
 
 type ResultCode int
@@ -28,11 +28,7 @@ const (
     NoValidResult
 )
 
-const template = `
-v = JSON.parse(json); 
-f = x=>%s; 
-v = f(v); 
-JSON.stringify(v, null, null); `
+const template = `v = JSON.parse(json); f = x=>%s; v = f(v); JSON.stringify(v, null, null);`
 
 // Test if stdout is hooked to a tty 
 // We want to know, so we can make good decisions about when to colorize
@@ -183,19 +179,15 @@ func slurpStream(vm *goja.Runtime, script string, d *jstream.Decoder,
     return NoError, nil
 }
 
-func processStream(script string, path *string, 
+func processStream(script string, strm io.Reader, 
     opts Options) (ResultCode, error) {
-    var f *os.File
+    var f io.Reader
     var err error
     var rc ResultCode
-    if path == nil {
+    if strm == nil {
         f = os.Stdin
     } else {
-        f, err = os.Open(*path)
-        if err != nil {
-            return rc, fmt.Errorf("%s: Could not open %s: %s\n", os.Args[0], *path, err) 
-        }
-        defer f.Close()
+        f = strm
     }
 
     vm := goja.New()
@@ -319,21 +311,27 @@ func main() {
     // run the provided script either against the
     // specified files or stdin
     var rc ResultCode
+    var filesBuf []byte 
+    var strm io.Reader
     if len(userFiles) > 0 {
         for i := range userFiles {
             userFile := userFiles[i]
-            rc, err = processStream(userScript, &userFile, opts)
+            buf, err := readUserFile(userFile)
             if err != nil {
                 fmt.Printf("%s: %s\n", os.Args[0], err)
                 return
             }
+            filesBuf = append(filesBuf, buf...)
         }
-    } else {
-        rc, err = processStream(userScript, nil, opts)
-        if err != nil {
-            fmt.Printf("%s: %s\n", os.Args[0], err)
-            return
+        if filesBuf != nil {
+            strm = strings.NewReader(string(filesBuf))
         }
+    }
+
+    rc, err = processStream(userScript, strm, opts)
+    if err != nil {
+        fmt.Printf("%s: %s\n", os.Args[0], err)
+        return
     }
 
     os.Exit(int(rc))
