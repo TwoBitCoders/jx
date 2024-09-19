@@ -12,7 +12,7 @@ Welcome to **jx**, a cutting-edge tool designed to revolutionize JSON processing
 
 ## Why jx?
 
-Why settle for ordinary tools when you can wield the power of **jx**? Imagine having a Swiss Army knife for all your JSON data needs. Lightweight yet mighty, **jx** transforms the way you handle JSON. Whether you’re parsing, manipulating, or extracting data, **jx**’s domain-specific language empowers you to do it all with ease and precision.
+Why settle for ordinary tools when you can wield the power of **jx**? Imagine having a Swiss Army knife for all your JSON data needs. Lightweight yet mighty, **jx** transforms the way you handle JSON. Whether you’re parsing, manipulating, or extracting data, **jx**’s industry standard javascript language empowers you to do it all with ease and precision.
 
 ## Installation
 
@@ -29,7 +29,7 @@ To get started with **jx**, follow these simple steps:
     ```
 3. **Run Your First Command**:
     ```sh
-    jx 'your JSON processing command here'
+   echo '{"foo":42}'| jx x
     ```
 
 ## Usage
