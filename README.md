@@ -4,11 +4,10 @@ Welcome to **jx**, a cutting-edge tool designed to revolutionize JSON processing
 
 ## Features
 
-- **Memory Safe**: Built in Go, ensuring secure and efficient JSON processing.
 - **JavaScript Syntax**: Leverage your JavaScript knowledge for seamless JSON manipulation.
+- **Memory Safe**: Built in Go, ensuring secure and efficient JSON processing.
 - **Cross-Platform**: Easily compile and run on any platform with our 100% Go implementation.
 - **High Performance**: Achieve speeds comparable to jq with added safety and ease of use.
-- **Intuitive Syntax**: Use familiar JavaScript to process JSON data.
 
 ## Why jx?
 
