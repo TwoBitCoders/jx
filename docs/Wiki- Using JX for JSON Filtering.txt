@@ -1,0 +1,67 @@
+Wiki Guide: Using JX for JSON Filtering - From Legacy to Modern JavaScript
+Overview:
+JX is a powerful JSON processor that allows users to filter, transform, and manipulate JSON data using JavaScript. Whether you're coming from a background using jq or you're new to processing JSON, JX is designed to accommodate multiple styles of JavaScript, all of which produce the same results, ensuring flexibility and ease of use.
+
+In this guide, we'll walk you through four different JavaScript approaches, from a legacy-style loop to a concise modern one-liner. Each example performs the same task—filtering dragons from a "Metallic" family in a JSON array—showcasing how JX supports a wide range of programming styles. The key takeaway is that regardless of which style you choose, JX delivers consistent results.
+
+Why Use Different Styles?
+JavaScript has evolved over the years, and many developers have different comfort levels with its syntax. The four examples below highlight this evolution, allowing you to write filters in the style you are most familiar with. Whether you're transitioning from jq, handling legacy code, or writing modern JavaScript, JX ensures you get the same filtered data across different syntax.
+
+Example 1: Legacy JavaScript (for loop)
+
+// filter-1.js
+{ 
+    var r = []; 
+    for(i = 0; i < x.dragons.length; i++) { 
+        let dragon = x.dragons[i];
+        if(dragon.family == 'Metallic') {
+            r[r.length] = dragon; 
+        } 
+    } 
+    return r; 
+}
+This example uses an explicit for loop to iterate over the array. It is similar to what you might have used in the 90s or early 2000s, where each element is manually indexed, making the logic clear but verbose.
+
+Example 2: for...of Loop
+
+// filter-2.js
+{ 
+    var r = []; 
+    for(dragon of x.dragons) { 
+        if(dragon.family === 'Metallic') {
+            r.push(dragon); 
+        } 
+    } 
+    return r; 
+}
+Here, we use for...of, which is a cleaner approach than managing indices manually. This style strikes a balance between explicit logic and more modern iteration, common in ES6+.
+
+Example 3: Using Array.filter()
+
+// filter-3.js
+{ 
+    var r = x.dragons.filter((dragon) => { return dragon.family === "Metallic" });
+    return r; 
+}
+This version introduces functional programming using Array.filter(), which streamlines the process by embedding the condition directly in the function. It is a good example for those comfortable with modern JavaScript and functional programming.
+
+Example 4: One-Liner Arrow Function
+
+// filter-4.js
+x.dragons.filter(dragon => dragon.family === "Metallic");
+This final example is a concise, one-line solution using modern arrow functions with an implicit return. It’s ideal for users who prefer minimalist, clean code and is especially useful for command-line execution.
+
+All Styles Work Equally with JX
+No matter which style you use—whether it's the verbose legacy loop or the modern one-liner—JX will return the same filtered results. This is particularly useful for users transitioning from tools like jq or those who are new to JSON processing and want to get started without worrying about JavaScript's ever-evolving syntax.
+
+Why Use .js Files for Filters?
+Rather than writing filters directly in the command line (where escaping characters can be a headache across different terminals like Windows Command Prompt, PowerShell, or Linux Bash), you can store your filters in .js files. This eliminates the need for dealing with terminal-specific quirks, making it easier to run your filters consistently across environments. For example, to run a filter, you simply:
+
+
+jx filter-4.js tests/data/dragons.json
+This command executes your one-line filter from a file, simplifying the process regardless of the terminal or operating system you're working with.
+
+Conclusion:
+JX empowers you to filter and manipulate JSON data using the style of JavaScript you’re most comfortable with, all while ensuring the same powerful results. Whether you're used to older syntax or you're adopting the latest ES6+ features, JX is versatile enough to handle it all. The simplicity of using .js files also ensures smooth operations across different environments.
+
+With JX, the choice is yours: write filters in a way that fits your workflow and get consistent, reliable results every time.
