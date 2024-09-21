@@ -56,8 +56,6 @@ We welcome contributions from the community! To contribute:
 4. Push to the branch (`git push origin feature-branch`).
 5. Create a new Pull Request.
 
-Check out our [Contributing Guide](#) for more details.
-
 ## Support and Sponsorship
 
 Love what we’re doing? Keep us caffeinated so we can keep coding! Consider sponsoring us:
@@ -68,8 +66,6 @@ Love what we’re doing? Keep us caffeinated so we can keep coding! Consider spo
 Join our growing community of developers contributing to and improving **jx**:
 - **[Submit Issues and Feature Requests](#)**
 - **[Join Discussions](#)**
-- **Twitter**: [@TwoBitCoders](#)
-- **Discord**: [Join our community](#)
 
 ## License
 
