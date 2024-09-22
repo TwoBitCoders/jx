@@ -21,10 +21,10 @@ To get started with **jx**, follow these simple steps:
     ```sh
     git clone https://github.com/TwoBitCoders/jx
     ```
-2. **Build jx**:
+2. **Build jx for your machine**:
     ```sh
     cd jx
-    go build
+    go build -o out/
     ```
 3. **Run Your First Command**:
     ```sh
@@ -45,16 +45,6 @@ Here are some common use cases to get you started:
     ```
 
 For detailed documentation, tutorials, and examples, visit our [Wiki](#).
-
-## Contributing
-
-We welcome contributions from the community! To contribute:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Create a new Pull Request.
 
 ## Support and Sponsorship
 
