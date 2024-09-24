@@ -8,12 +8,13 @@ Welcome to **jx**, a powerful command-line tool for JSON processing! Developed b
 - **Memory Safe**: Built in Go, ensuring fast and secure processing, even with large datasets.
 - **Cross-Platform**: Seamlessly runs on Linux, macOS, and Windows thanks to Go's portability.
 - **High Performance**: Comparable to jq, but with the safety and simplicity of Go and JavaScript.
+- **Single-binary install**: It's just a single binary, put it somewhere on your path, mark it executable and your good to go
 
 ## Why jx?
 
 **jx** is your ultimate tool for JSON manipulation. Whether you're working with APIs, logs, or configuration files, **jx** provides an intuitive, command-line experience without sacrificing performance or security. With the power of Go and the flexibility of JavaScript, it’s ideal for developers who want to avoid learning a new syntax while gaining the safety of a memory-safe language.
 
-Inspired by efficient tools like [ripgrep](https://github.com/BurntSushi/ripgrep), **jx** is designed to be fast and user-friendly, eliminating unnecessary complexity from your JSON processing workflows.
+**jx** is designed to be fast and user-friendly, eliminating unnecessary complexity from your JSON processing workflows.
 
 ### Key Advantages:
 - **No Learning Curve**: Use familiar JavaScript syntax—no need to learn jq's DSL.
@@ -44,6 +45,11 @@ Alternatively, download pre-built binaries from our [releases page](#) and add t
 ## Usage
 
 **jx** makes JSON manipulation easy and accessible directly from your terminal.
+
+All examples assume you're using a Bash shell.
+
+Note: for PowerShell Users on Windows: 
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted
 
 - **Extract a Field**:
     ```sh
