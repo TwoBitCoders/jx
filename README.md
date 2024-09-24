@@ -1,66 +1,89 @@
-# jx: Memory-Safe JSON Processing using JavaScript implemented in Go
+# jx: Command-Line JSON Processing with JavaScript Syntax, Powered by Go
 
-Welcome to **jx**, a cutting-edge tool designed to revolutionize JSON processing! Developed by **TwoBitCoders**, we are a group of passionate professionals dedicated to making life easier for our fellow coders. With **jx**, we combine the performance and safety of Go with the familiarity of JavaScript syntax, eliminating the need to learn jq’s complex language.
+Welcome to **jx**, a powerful command-line tool for JSON processing! Developed by **TwoBitCoders**, **jx** fuses the memory-safety and performance of Go with the flexibility of JavaScript syntax. Unlike other tools like jq that require learning a new domain-specific language, **jx** allows you to use your existing JavaScript knowledge to handle JSON with ease.
 
 ## Features
 
-- **JavaScript Syntax**: Leverage your JavaScript knowledge for seamless JSON manipulation.
-- **Memory Safe**: Built in Go, ensuring secure and efficient JSON processing.
-- **Cross-Platform**: Easily compile and run on any platform with our 100% Go implementation.
-- **High Performance**: Achieve speeds comparable to jq with added safety and ease of use.
+- **JavaScript Syntax**: Use familiar JavaScript constructs to filter, transform, and manipulate JSON data.
+- **Memory Safe**: Built in Go, ensuring fast and secure processing, even with large datasets.
+- **Cross-Platform**: Seamlessly runs on Linux, macOS, and Windows thanks to Go's portability.
+- **High Performance**: Comparable to jq, but with the safety and simplicity of Go and JavaScript.
 
 ## Why jx?
 
-Why settle for ordinary tools when you can wield the power of **jx**? Imagine having a Swiss Army knife for all your JSON data needs. Lightweight yet mighty, **jx** transforms the way you handle JSON. Whether you’re parsing, manipulating, or extracting data, **jx**’s industry standard javascript language empowers you to do it all with ease and precision.
+**jx** is your ultimate tool for JSON manipulation. Whether you're working with APIs, logs, or configuration files, **jx** provides an intuitive, command-line experience without sacrificing performance or security. With the power of Go and the flexibility of JavaScript, it’s ideal for developers who want to avoid learning a new syntax while gaining the safety of a memory-safe language.
+
+Inspired by efficient tools like [ripgrep](https://github.com/BurntSushi/ripgrep), **jx** is designed to be fast and user-friendly, eliminating unnecessary complexity from your JSON processing workflows.
+
+### Key Advantages:
+- **No Learning Curve**: Use familiar JavaScript syntax—no need to learn jq's DSL.
+- **Efficient and Lightweight**: Go's compilation speed and memory safety ensure high performance.
+- **No UI Overhead**: Designed to be a lean, CLI-only tool—no unnecessary graphical interface to bloat your workflow.
+- **Robust and Portable**: Works out of the box across multiple platforms.
 
 ## Installation
 
-To get started with **jx**, follow these simple steps:
+To install **jx**, follow these steps:
 
 1. **Clone the Repo**:
     ```sh
     git clone https://github.com/TwoBitCoders/jx
     ```
-2. **Build jx for your machine**:
+2. **Build jx**:
     ```sh
     cd jx
     go build -o out/
     ```
-3. **Run Your First Command**:
+3. **Run a Sample Command**:
     ```sh
-   echo '{"foo":42}'| jx x
+    echo '{"foo":42}' | jx 'x.foo'
     ```
+
+Alternatively, download pre-built binaries from our [releases page](#) and add them to your `PATH`.
 
 ## Usage
 
-Here are some common use cases to get you started:
+**jx** makes JSON manipulation easy and accessible directly from your terminal.
 
 - **Extract a Field**:
     ```sh
     echo '{"foo":42,"bar":0}' | jx 'x.foo'
     ```
-- **Filter Data**:
+- **Filter an Array**:
     ```sh
     echo '[{"foo":42},{"foo":0}]' | jx 'x.filter(item => item.foo !== 0)'
     ```
+- **Transform Data**:
+    ```sh
+    echo '[{"foo":42}]' | jx 'x.map(item => ({ bar: item.foo * 2 }))'
+    ```
 
-For detailed documentation, tutorials, and examples, visit our [Wiki](#).
+For detailed examples and advanced usage, check out the [Wiki](#).
 
-## Support and Sponsorship
+## Contributing
 
-Love what we’re doing? Keep us caffeinated so we can keep coding! Consider sponsoring us:
-- **[Become a Sponsor](#)**
+We welcome contributions from the community. Here's how you can get involved:
 
-## Community
+- **Submit Issues**: Encountered a bug or have a feature request? Open an issue [here](#).
+- **Create Pull Requests**: If you want to contribute code, check our contribution guidelines in the `CONTRIBUTING.md` file.
+- **Join Discussions**: Discuss features, improvements, or usage questions [here](#).
 
-Join our growing community of developers contributing to and improving **jx**:
-- **[Submit Issues and Feature Requests](#)**
-- **[Join Discussions](#)**
+## Support
+
+Love **jx**? Consider supporting us:
+
+- **[Become a Sponsor](#)**: Help us keep improving **jx** with your generous support.
 
 ## License
 
-**jx** is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+**jx** is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-**TwoBitCoders**: Making code easier, one line at a time.
+**TwoBitCoders**: Empowering developers, one tool at a time.
+
+---
+
+### Sources of Inspiration:
+- [jq](https://github.com/stedolan/jq): The original inspiration for JSON processing tools.
+- [ripgrep](https://github.com/BurntSushi/ripgrep): We admire the simplicity and speed of ripgrep, a key influence on **jx**'s design philosophy.
