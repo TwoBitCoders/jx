@@ -40,7 +40,7 @@ To install **jx**, follow these steps:
     echo '{"foo":42}' | jx 'x.foo'
     ```
 
-Alternatively, download pre-built binaries from our [releases page](releases) and add them to your `PATH`.
+Alternatively, download pre-built binaries from our [releases page](https://github.com/TwoBitCoders/jx/releases) and add them to your `PATH`.
 
 ## Usage
 
@@ -70,9 +70,9 @@ For detailed examples and advanced usage, check out the [Wiki](#).
 
 We welcome contributions from the community. Here's how you can get involved:
 
-- **Submit Issues**: Encountered a bug or have a feature request? Open an issue [here](issues).
+- **Submit Issues**: Encountered a bug or have a feature request? Open an [issue](https://github.com/TwoBitCoders/jx/issues).
 - **Create Pull Requests**: If you want to contribute code, check our contribution guidelines in the `CONTRIBUTING.md` file.
-- **Join Discussions**: Discuss features, improvements, or usage questions [here](discussions).
+- **Join Discussions**: Discuss features, improvements, or usage questions [here](https://github.com/TwoBitCoders/jx/discussions).
 
 ## Support
 
