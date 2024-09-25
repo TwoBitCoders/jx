@@ -64,7 +64,7 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted
     echo '[{"foo":42}]' | jx 'x.map(item => ({ bar: item.foo * 2 }))'
     ```
 
-For detailed examples and advanced usage, check out the [Wiki](#).
+For detailed examples and advanced usage, check out the [Wiki](https://github.com/TwoBitCoders/jx/wiki/Advanced-Filtering-Techniques-with-jx).
 
 ## Contributing
 
