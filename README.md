@@ -79,6 +79,7 @@ We welcome contributions from the community. Here's how you can get involved:
 Love **jx**? Consider supporting us:
 
 - **[Become a Sponsor](https://patreon.com/TwoBitCoders)**: Help us keep improving **jx** with your generous support.
+- For more tools and projects, visit the **[TwoBitCoders GitHub](https://github.com/TwoBitCoders)** page.
 
 ## License
 
