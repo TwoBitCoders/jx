@@ -1,8 +1,36 @@
 #!/bin/sh 
 
-GOOS='linux' GOARCH='amd64' go build -o out/linux/amd64/
-GOOS='linux' GOARCH='386' go build -o out/linux/386/
-GOOS='darwin' GOARCH='amd64' go build -o out/darwin/amd64/
-GOOS='darwin' GOARCH='arm64' go build -o out/darwin/arm64/
-GOOS='windows' GOARCH='amd64' go build -o out/windows/amd64/
-GOOS='windows' GOARCH='386' go build -o out/windows/386/
+mkdir -p ./dist/
+
+export VER=`rg --no-line-number --trim --replace '$1' 'Version = "([^\s]*)"' ./main.go`
+
+export GOOS='linux' GOARCH='amd64'
+echo "building ${GOOS} ${GOARCH} ${VER}"
+go build -o "./out/$GOOS/$GOARCH/"
+tar -czvf "./dist/jx_${GOOS}_${GOARCH}-${VER}.tar.gz" "./out/$GOOS/$GOARCH/jx"
+
+export GOOS='linux' GOARCH='386'
+echo "building ${GOOS} ${GOARCH} ${VER}"
+go build -o "./out/$GOOS/$GOARCH/"
+tar -czvf "./dist/jx_${GOOS}_${GOARCH}-${VER}.tar.gz" "./out/$GOOS/$GOARCH/jx"
+
+export GOOS='darwin' GOARCH='amd64'
+echo "building ${GOOS} ${GOARCH} ${VER}"
+go build -o "./out/$GOOS/$GOARCH/"
+tar -czvf "./dist/jx_${GOOS}_${GOARCH}-${VER}.tar.gz" "./out/$GOOS/$GOARCH/jx"
+
+export GOOS='darwin' GOARCH='arm64' 
+echo "building ${GOOS} ${GOARCH} ${VER}"
+go build -o "./out/$GOOS/$GOARCH/"
+tar -czvf "./dist/jx_${GOOS}_${GOARCH}-${VER}.tar.gz" "./out/$GOOS/$GOARCH/jx"
+
+export GOOS='windows' GOARCH='amd64' VER='0.0.6'
+echo "building ${GOOS} ${GOARCH} ${VER}"
+go build -o "./out/$GOOS/$GOARCH/"
+zip "./dist/jx_${GOOS}_${GOARCH}-${VER}.zip" "./out/$GOOS/$GOARCH/jx.exe"
+
+export GOOS='windows' GOARCH='386'
+echo "building ${GOOS} ${GOARCH} ${VER}"
+go build -o "./out/$GOOS/$GOARCH/"
+zip "./dist/jx_${GOOS}_${GOARCH}-${VER}.zip" "./out/$GOOS/$GOARCH/jx.exe"
+
