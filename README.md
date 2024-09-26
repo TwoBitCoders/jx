@@ -22,6 +22,10 @@ Welcome to **jx**, a powerful command-line tool for JSON processing! Developed b
 - **No UI Overhead**: Designed to be a lean, CLI-only tool—no unnecessary graphical interface to bloat your workflow.
 - **Robust and Portable**: Works out of the box across multiple platforms.
 
+## Latest Release
+
+For standalone installation, you can download the latest release directly from our [Releases Page](https://github.com/TwoBitCoders/jx/releases).
+
 ## Installation
 
 To install **jx**, follow these steps:
