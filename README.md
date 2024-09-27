@@ -39,10 +39,11 @@ To install **jx**, follow these steps:
     cd jx
     go build -o out/
     ```
-3. **Run a Sample Command**:
+3. **Run the Simplest Command**:
     ```sh
-    echo '{"foo":42}' | jx 'x.foo'
+    echo '{"foo":42}' | jx x
     ```
+    'x' has your parsed JSON in it - so 'jx x' will pretty print your input data.
 
 Alternatively, download pre-built binaries from our [releases page](https://github.com/TwoBitCoders/jx/releases) and add them to your `PATH`.
 
@@ -50,10 +51,8 @@ Alternatively, download pre-built binaries from our [releases page](https://gith
 
 **jx** makes JSON manipulation easy and accessible directly from your terminal.
 
-All examples assume you're using a Bash shell.
+All examples assume you're using a Bash shell, you are always passed variable 'x', it's value is the result of parsing your JSON.
 
-Note: for PowerShell Users on Windows: 
-Set-ExecutionPolicy -ExecutionPolicy Unrestricted
 
 - **Extract a Field**:
     ```sh
@@ -67,6 +66,8 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted
     ```sh
     echo '[{"foo":42}]' | jx 'x.map(item => ({ bar: item.foo * 2 }))'
     ```
+Note: for PowerShell Users on Windows: 
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted
 
 For detailed examples and advanced usage, check out the [Wiki](https://github.com/TwoBitCoders/jx/wiki/Advanced-Filtering-Techniques-with-jx).
 
