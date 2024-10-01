@@ -64,12 +64,19 @@ All examples assume you're using a Bash shell, you are always passed variable 'x
     ```
 - **Transform Data**:
     ```sh
-    echo '[{"foo":42}]' | jx 'x.map(item => ({ bar: item.foo * 2 }))'
+    echo '[{"foo":21}]' | jx 'x.map(item => ({ bar: item.foo * 2 }))'
     ```
-Note: for PowerShell Users on Windows: 
+- **Multiple Statements**:
+    ```sh
+    echo '{"foo":21}' | jx '{let op1 = x.foo;let op2 = 2;return op1*op2}'
+    ```
+
+Note: If you need multiple statements throw braces around your code, turning it into a "block body".
+
+Note: For PowerShell Users on Windows: 
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted
 
-For detailed examples and advanced usage, check out the [Wiki](https://github.com/TwoBitCoders/jx/wiki/Advanced-Filtering-Techniques-with-jx).
+For more detailed examples and advanced usage, check out the [Wiki](https://github.com/TwoBitCoders/jx/wiki/Advanced-Filtering-Techniques-with-jx).
 
 ## Contributing
 
