@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    Version = "0.0.6"
+    Version = "0.0.7"
 )
 
 type ResultCode int
@@ -32,8 +32,8 @@ const template = `v = JSON.parse(json); f = x=>%s; v = f(v); JSON.stringify(v, n
 
 // Test if stdout is hooked to a tty 
 // We want to know, so we can make good decisions about when to colorize
-func isTTY() (bool) {
-    stat, _ := os.Stdout.Stat()
+func isTTY(f *os.File) (bool) {
+    stat, _ := f.Stat()
     if (stat.Mode() & os.ModeCharDevice) == os.ModeCharDevice {
        return true
     }
@@ -41,7 +41,7 @@ func isTTY() (bool) {
 }
 
 func formatJSON(buf []byte, opts Options) ([]byte, error) {
-    if (opts.color || isTTY()) && !opts.mono {
+    if (opts.color || isTTY(os.Stdout)) && !opts.mono {
         buf = pretty.Color(buf, nil)
     }
 	return buf, nil
@@ -50,7 +50,7 @@ func formatJSON(buf []byte, opts Options) ([]byte, error) {
 func formatJSONIndent(buf []byte, indent string, opts Options) ([]byte, error) {
     var pOpts = &pretty.Options{Width: 80, Prefix:"", Indent: indent, SortKeys: opts.sortKeys}
     buf = pretty.PrettyOptions(buf, pOpts)
-    if (opts.color || isTTY()) && !opts.mono {
+    if (opts.color || isTTY(os.Stdout)) && !opts.mono {
         buf = pretty.Color(buf, nil)
     }
 	return buf, nil
@@ -69,6 +69,25 @@ func readUserFile(path string) ([]byte, error) {
             return nil, err
         }
         return buf, nil
+}
+
+func compileScript(script string) (*goja.Program, error) {
+ 
+    vm := goja.New()
+    vm.Set("json", vm.ToValue("{}"))
+    js := fmt.Sprintf(template, script)
+
+    p, err := goja.Compile("foo", js, false)
+    if err != nil {
+        return nil, err
+    }
+
+    _, err = vm.RunProgram(p)
+    if err != nil {
+        return nil, err
+    }
+
+    return p, nil
 }
 
 func runScript(vm *goja.Runtime, script string, jsonVal []byte) (goja.Value, error) {
@@ -249,6 +268,10 @@ func main() {
     flag.BoolVarP(&opts.printVersion, "version", "V", false, "Print program version and exit")
     flag.Parse()
 
+    //
+    // Pure opts stuff
+    //
+
     if opts.help {
         flag.Usage()
         os.Exit(int(UsageError))
@@ -259,31 +282,6 @@ func main() {
         os.Exit(int(NoError))
     }
 
-    // test if stdin has stuff to read, so we can make more decisions later
-    stdinData := false 
-    stat, _ := os.Stdin.Stat()
-    if (stat.Mode() & os.ModeCharDevice) == 0 {
-        stdinData = true
-    }
-
-    // No data to read and no args at all, give the user a hand and exit
-    if !stdinData && (len(flag.Args()) < 1) {
-        flag.Usage()
-        os.Exit(int(UsageError))
-    } 
-
-    // test if the user specified a script as an option, if 
-    // they did, userFile inputs move up one position
-    userFileIndex := 1
-    if opts.scriptFile != "" {
-        userFileIndex = 0
-    }
-
-    userFiles := make([]string, 0)
-    if len(flag.Args()) >= userFileIndex {
-        userFiles = flag.Args()[userFileIndex:]
-    }
-
     // if the user set indent outside range let them know and exit
     if opts.indent < 0 || opts.indent > 7 {
         fmt.Printf("%s: --indent takes a number between -1 and 7\n", os.Args[0])
@@ -291,29 +289,56 @@ func main() {
         os.Exit(int(UsageError))
     }
 
-    // get the user script
+	// 
+    // Handle user script
+	//
     var userScript string
     var err error
+    userFileIndex := 1
     if opts.scriptFile != "" {
         buf, err := readUserFile(opts.scriptFile)
         if err != nil {
             fmt.Printf("%s\n", err)
             os.Exit(int(UsageError))
         }
+
+        // if the user specified a script as an option userFile inputs move up 
+        // one position
+        userFileIndex = 0
+
         userScript = string(buf)
-    } else if opts.scriptFile == "" && len(flag.Args()) < 1 {
-        userScript = "x"
-    } else {
+    } else if len(flag.Args()) > 0 {
         userScript = flag.Args()[0]
     }
 
-    // finally get down to business
-    // run the provided script either against the
-    // specified files or stdin
-    var rc ResultCode
-    var filesBuf []byte 
+    // Still no userScript and either stdout or stdin is not a terminal 
+    //(i.e., it is redirected), default the userScript to "x"
+    if(userScript == "" && (!isTTY(os.Stdout) || !isTTY(os.Stdin))) {
+        userScript = "x"
+    }
+
+    if(userScript == "") {
+        flag.Usage()
+        os.Exit(int(UsageError))
+    }
+
+    // Try to compile the userScript
+    _, err = compileScript(userScript)
+    if err != nil {
+        fmt.Printf("%s\n", err)
+        os.Exit(int(CompileError))
+    }
+
+    // Scrabble up any remaining file paths
+    userFiles := make([]string, 0)
+    if len(flag.Args()) >= userFileIndex {
+        userFiles = flag.Args()[userFileIndex:]
+    }
+
+	// If there are input files create a stream to read them
     var strm io.Reader
     if len(userFiles) > 0 {
+        var filesBuf []byte 
         for i := range userFiles {
             userFile := userFiles[i]
             buf, err := readUserFile(userFile)
@@ -328,7 +353,10 @@ func main() {
         }
     }
 
-    rc, err = processStream(userScript, strm, opts)
+    // finally get down to business
+    // run the provided script either against the
+    // specified files or stdin
+	rc, err := processStream(userScript, strm, opts)
     if err != nil {
         fmt.Printf("%s: %s\n", os.Args[0], err)
         return
