@@ -24,7 +24,7 @@ echo "building ${GOOS} ${GOARCH} ${VER}"
 go build -o "./out/$GOOS/$GOARCH/"
 tar -czvf "./dist/jx_${GOOS}_${GOARCH}-${VER}.tar.gz" "./out/$GOOS/$GOARCH/jx"
 
-export GOOS='windows' GOARCH='amd64' VER='0.0.6'
+export GOOS='windows' GOARCH='amd64'
 echo "building ${GOOS} ${GOARCH} ${VER}"
 go build -o "./out/$GOOS/$GOARCH/"
 zip "./dist/jx_${GOOS}_${GOARCH}-${VER}.zip" "./out/$GOOS/$GOARCH/jx.exe"
