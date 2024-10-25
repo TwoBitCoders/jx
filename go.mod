@@ -1,4 +1,4 @@
-module example.com/jx
+module github.com/TwoBitCoders/jx
 
 go 1.16
 

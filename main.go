@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    Version = "0.0.7"
+    Version = "0.0.8"
 )
 
 type ResultCode int
@@ -320,13 +320,6 @@ func main() {
     if(userScript == "") {
         flag.Usage()
         os.Exit(int(UsageError))
-    }
-
-    // Try to compile the userScript
-    _, err = compileScript(userScript)
-    if err != nil {
-        fmt.Printf("%s\n", err)
-        os.Exit(int(CompileError))
     }
 
     // Scrabble up any remaining file paths
